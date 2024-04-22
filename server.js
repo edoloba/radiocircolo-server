@@ -11,10 +11,6 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5002;
 
-// const corsOption = {
-//   origin: "https://radiocircolo-front.onrender.com"
-// }
-
 // Define the origins you want to allow
 const allowOrigins = ["https://radiocircolo.onrender.com"];
 
@@ -26,7 +22,7 @@ app.use(cors({
 }));
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, "./client/build")));
+// app.use(express.static(path.join(__dirname, "../radiocircolo-client/build")));
 
 // Parse JSON bodies
 app.use(bodyParser.json());
