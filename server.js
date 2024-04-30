@@ -51,6 +51,36 @@ const podcastSchema = new mongoose.Schema({
 const Podcast = mongoose.model('Podcast', podcastSchema, "podcasts");
 
 // Define API endpoint to fetch podcasts data
+// app.get("/", async (req, res) => {
+//   try {
+//     // Fetch podcasts data from Mixcloud API
+//     const username = process.env.MIXCLOUD_USERNAME;
+//     const clientID = process.env.MIXCLOUD_CLIENT_ID;
+//     const mixcloudResponse = await axios.get(
+//       `https://api.mixcloud.com/${username}/cloudcasts/?limit=100&client_id=${clientID}`
+//     );
+
+
+//     // Extract relevant data from Mixcloud response
+//     const mixcloudPodcasts = mixcloudResponse.data.data.map(
+//       (mixcloudPodcast) => ({
+//         name: mixcloudPodcast.name,
+//         picture: {
+//           normal: mixcloudPodcast.pictures["1024wx1024h"],
+//           extra_large: mixcloudPodcast.pictures.extra_large,
+//         },
+//         audio: mixcloudPodcast.url,
+//         id: mixcloudPodcast.key,
+//         slug: mixcloudPodcast.slug,
+//       })
+//       );
+//       res.json(mixcloudPodcasts);
+//   } catch (error) {
+//     console.error("Error fetching podcasts:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
+
 app.get("/", async (req, res) => {
   try {
     // Fetch podcasts data from Mixcloud API
@@ -59,7 +89,6 @@ app.get("/", async (req, res) => {
     const mixcloudResponse = await axios.get(
       `https://api.mixcloud.com/${username}/cloudcasts/?limit=100&client_id=${clientID}`
     );
-
 
     // Extract relevant data from Mixcloud response
     const mixcloudPodcasts = mixcloudResponse.data.data.map(
@@ -73,8 +102,23 @@ app.get("/", async (req, res) => {
         id: mixcloudPodcast.key,
         slug: mixcloudPodcast.slug,
       })
+    );
+
+    // Fetch additional data from MongoDB
+    const mongoPodcasts = await Podcast.find({}); // Fetch all documents from MongoDB
+
+    // Combine data from Mixcloud API and MongoDB
+    const combinedPodcasts = mixcloudPodcasts.map((mixcloudPodcast) => {
+      const mongoPodcast = mongoPodcasts.find(
+        (mongoPodcast) => mongoPodcast.slug === mixcloudPodcast.slug
       );
-      res.json(mixcloudPodcasts);
+      return {
+        ...mixcloudPodcast,
+        ...(mongoPodcast && { ...mongoPodcast._doc }),
+      };
+    });
+
+    res.json(combinedPodcasts);
   } catch (error) {
     console.error("Error fetching podcasts:", error);
     res.status(500).json({ error: "Internal server error" });
