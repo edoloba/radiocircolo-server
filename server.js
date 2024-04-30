@@ -12,13 +12,13 @@ const app = express();
 const PORT = process.env.PORT || 5002;
 
 // Define the origins you want to allow
-const allowOrigins = ["https://radiocircolo.onrender.com"];
+// const allowOrigins = ["https://radiocircolo.onrender.com"];
 
 app.use(express.json());
 
 // Use cors middleware with allowOrigins option
 app.use(cors({
-  origin: allowOrigins
+  origin: ["https://radiocircolo.onrender.com", "https://radiocircolo-server.onrender.com"]
 }));
 
 // Serve static files from the React app
