@@ -22,7 +22,7 @@ app.use(cors({
 }));
 
 // Serve static files from the React app
-// app.use(express.static(path.join(__dirname, "../radiocircolo-client/build")));
+app.use(express.static(path.join(__dirname, "../radiocircolo-client/build")));
 
 // Parse JSON bodies
 app.use(bodyParser.json());
